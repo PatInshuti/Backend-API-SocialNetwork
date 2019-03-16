@@ -1,2 +1,2 @@
 # Backend-API-SocialNetwork
-social Media for Developers
+Social Network for Developers
