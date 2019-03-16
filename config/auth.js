@@ -2,26 +2,26 @@
 
 module.exports ={
   'facebookAuth' : {
-		'clientID' 		: '', // your App ID
-		'clientSecret' 	: '', // your App Secret
+		'clientID' 		: '22222', // your App ID
+		'clientSecret' 	: '2222', // your App Secret
 		'callbackURL' 	: 'http://localhost:5000/api/users/auth/facebook/callback'
 	},
 
 	'twitterAuth' : {
-		'consumerKey' 		: '',
-		'consumerSecret' 	: '',
+		'consumerKey' 		: '2222',
+		'consumerSecret' 	: '2222',
 		'callbackURL' 		: 'http://localhost:5000/api/users/auth/twitter/callback'
 	},
 
 	'googleAuth' : {
-		'clientID' 		: '',
+		'clientID' 		: '2222',
 		'clientSecret' 	: '',
 		'callbackURL' 	: 'http://localhost:5000/api/users/auth/google/callback'
   },
   
   'githubAuth':{
-    'clientID'      :'',
-    'clientSecret'  :'',
+    'clientID'      :'222',
+    'clientSecret'  :'222',
     'callbackURL'   : 'http://localhost:5000/api/users/auth/github/callback'
 
 
