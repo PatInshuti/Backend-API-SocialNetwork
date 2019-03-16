@@ -120,23 +120,86 @@ router.get('/current',passport.authenticate('jwt', { session: false }),
 
 
 
-// GET /auth/google
-//   Use passport.authenticate() as route middleware to authenticate the
-//   request.  The first step in Google authentication will involve
-//   redirecting the user to google.com.  After authorization, Google
-//   will redirect the user back to this application at /auth/google/callback
-// router.get('/auth/google',
-//   passport.authenticate('google', { scope: ['https://www.googleapis.com/auth/plus.login'] }));
+// =========================================================================
+// FACEBOOK ================================================================
+// =========================================================================
 
-// // GET /auth/google/callback
-// //   Use passport.authenticate() as route middleware to authenticate the
-// //   request.  If authentication fails, the user will be redirected back to the
-// //   login page.  Otherwise, the primary route function function will be called,
-// //   which, in this example, will redirect the user to the home page.
-// router.get('/auth/google/callback', 
-//   passport.authenticate('google', { failureRedirect: '/login' }),
-//   function(req, res) {
-//     res.redirect('/');
-//   });
+router.get('/auth/facebook', passport.authenticate('facebook', { 
+  scope : ['email','public_profile', 'photos']
+}));
 
+//CALL BACK FROM API
+router.get('/auth/facebook/callback', passport.authenticate('facebook', { failureRedirect : '/'}), (req, res) =>{
+      // Successful authentication, AND ASSIGN THE USER A JWT TOKEN
+});
+
+
+
+// =========================================================================
+// GOOGLE ==================================================================
+// =========================================================================
+router.get('/auth/google',
+passport.authenticate('google', { scope: ['https://www.googleapis.com/auth/plus.login'] }));
+
+//CALL BACK FROM API
+router.get('/auth/google/callback', 
+passport.authenticate('google', { failureRedirect: '/login' }), (req, res) => {
+  
+  const payload = { id:req.user.id, google_id: req.user.google.id, name: req.user.google.displayName, avatar: req.user.google.picture, gender:req.user.google.gender }; // Create JWT Payload
+  // Sign Token
+  jwt.sign(payload, keys.secretOrKey, { expiresIn: 3600 },(err, token) => {
+      res.json({
+          success: true,
+          token: 'Bearer ' + token
+      });
+      }
+  );
+});
+
+
+// =========================================================================
+// TWITTER =================================================================
+// =========================================================================
+
+router.get('/auth/twitter', passport.authenticate('twitter'));
+
+//CALL BACK FROM API
+router.get('/auth/twitter/callback',
+passport.authenticate('twitter', { failureRedirect: '/login' }), (req, res)=>{
+  const payload = { id:req.user.id, google_id: req.user.google.id, name: req.user.google.displayName, avatar: req.user.google.picture, gender:req.user.google.gender }; // Create JWT Payload
+  // Sign Token
+  jwt.sign(payload, keys.secretOrKey, { expiresIn: 3600 },(err, token) => {
+    res.json({
+        success: true,
+        token: 'Bearer ' + token
+    });
+    }
+);
+
+});
+
+// =========================================================================
+// GITHUB ==================================================================
+// =========================================================================
+
+router.get('/auth/github',
+passport.authenticate('github', { scope: [ 'user:email' ] }));
+
+router.get('/auth/github/callback', passport.authenticate('github', { failureRedirect: '/login' }),(req, res) =>{
+  
+  const payload = { id:req.user.id, github_id: req.user.github.id, name: req.user.github.username, avatar: req.user.avatar }; // Create JWT Payload
+  // Sign Token
+  jwt.sign(payload, keys.secretOrKey, { expiresIn: 3600 },(err, token) => {
+      res.json({
+          success: true,
+          token: 'Bearer ' + token
+      });
+      }
+  );
+});
+
+//Applies for every authentication -- Basically blacklist the token used
+router.get('/logout', passport.authenticate('jwt', {session:false}), (req, res) =>{
+  console.log(req.user);
+});
 module.exports = router;
