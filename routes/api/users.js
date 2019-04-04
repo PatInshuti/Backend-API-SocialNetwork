@@ -5,11 +5,11 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const keys = require('../../config/keys');
 const passport = require('passport');
+const cookieParser = require('cookie-parser');
 
 // Load Input Validation
 const validateRegisterInput = require('../../validation/register');
 const validateLoginInput = require('../../validation/login');
-
 // Load User model
 const User = require('../../models/User');
 
@@ -90,26 +90,43 @@ router.post('/login', (req, res) => {
         const payload = { id: user.id, name: user.name, avatar: user.avatar }; // Create JWT Payload
 
         // Sign Token
-        jwt.sign(payload, keys.secretOrKey, { expiresIn: 3600 },(err, token) => {
-            res.json({
-              success: true,
-              token: 'Bearer ' + token
-            });
-          }
-        );
+        var token = jwt.sign(payload, keys.secretOrKey, { expiresIn: 3600 });
+
+        // jwt.sign(payload, keys.secretOrKey, { expiresIn: 60 },(err, token) => {
+        //   Jtoken = token;
+        //     res.json({
+        //       success: true,
+        //       token: 'Bearer ' + token
+        //     });
+        //   }
+        // );
+        res.cookie('jwt',token, {httpOnly: true}); // add cookie here
+
+        res.json({'success':'match'})
+        //console.log(token);
       } else {
         errors.password = 'Password incorrect';
         return res.status(400).json(errors);
       }
     });
   });
+ 
 });
+
+function basicauth(req, res, next){
+  req.headers.authorization = Jtoken;
+  console.log('After ' + req.headers.authorization);
+  next()
+}
 
 // @route   GET api/users/current
 // @desc    Return current user
 // @access  Private
-router.get('/current',passport.authenticate('jwt', { session: false }),
+
+router.get('/current', passport.authenticate('jwt', { session: false }),
   (req, res) => {
+    
+
     res.json({
       id: req.user.id,
       name: req.user.name,

@@ -14,17 +14,30 @@ var TwitterStrategy = require('passport-twitter').Strategy;
 // JWT CUSTOM LOCAL AUTHENTICATION =========================================
 // =========================================================================
 
+var cookieExtractor = function(req) {
+    var token = null;
+    if (req && req.cookies)
+    {
+        token = req.cookies['jwt'];
+    }
+    return token;
+};
+
 const opts = {};
 
-opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
+opts.jwtFromRequest = cookieExtractor;
 opts.secretOrKey = keys.secretOrKey;
 
+console.log(opts.jwtFromRequest);
 module.exports = passport =>{
+    
+
     passport.use(new JwtStrategy(opts, (jwt_payload, done) =>{
         
         User.findById(jwt_payload.id)
             .then(user =>{
                 if (user){
+                    //console.log("opts:::::     :" + token );
                     return done(null, user);
                 }
 
